@@ -22,21 +22,23 @@ const getPenddingPayments = () => {
     return creditsModel.find({ state: true, isPay: false });
 }
 
-const getPenddinByUser = async(DNI) => {
-    const userM = userModel.find({ credits: { $elemMatch: { state: true, isPay: false } } });
-    let m = await userM;
-    console.log("getPenddinByUser -> m", m);
-    // // let user = await userM.credits.find({ state: true, isPay: false });
-    // // console.log("getPenddinByUser -> user", user)
-    return userM;
+const getTotalCredits = () => {
+    return creditsModel.aggregate([{
+            $match: { isPay: false, state: true },
+        },
+        {
+            $project: { value: 1 },
+        }
+    ])
 }
+
 
 module.exports = {
     add: addCredit,
     getAll: getCreditsByUser,
     denies: getDeniesCredits,
     pendding: getPenddingPayments,
-    penddingByUser: getPenddinByUser,
-    //Get
-    //Update
+    totalCredits: getTotalCredits
+        //Get
+        //Update
 }

@@ -69,6 +69,24 @@ const getPenddingByUser = async(DNI) => {
     }
 }
 
+const getTotalCredits = async() => {
+    try {
+        const credits = await store.totalCredits();
+        const total = credits.reduce((total, credit) => {
+            if (total.value) {
+                return total.value + credit.value
+            } else {
+                return total + credit.value
+            }
+        })
+        return total;
+    } catch (error) {
+        const message = 'Ocurrio un error encontrando los creditos totales'
+        console.error("getTotalCredits controller error", error);
+        return message;
+    }
+}
+
 
 module.exports = {
     createCredit,
@@ -76,5 +94,6 @@ module.exports = {
     getDenyCredits,
     getPenddingPayments,
     getPenddingByUser,
+    getTotalCredits
     // getUserByDNI
 }

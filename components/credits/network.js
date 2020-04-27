@@ -32,6 +32,15 @@ router.get("/pendding", async(req, res) => {
     }
 });
 
+router.get("/total", async(req, res) => {
+    try {
+        const success = await controller.getTotalCredits();
+        response.success(req, res, success, 200);
+    } catch (error) {
+        response.error(req, res, error, 400, "Error en el controlador getTotalCredits");
+    }
+});
+
 router.get("/pendding/user/:id", async(req, res) => {
     console.log(req.params.id);
     try {
