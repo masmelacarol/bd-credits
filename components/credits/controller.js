@@ -2,8 +2,20 @@ const store = require('./store');
 
 const createCredit = async(DNI, credit) => {
     try {
-        let numberRandom = Math.random() > 0.5;
-        credit.state = numberRandom;
+        const userCredit = await store.getAll(DNI);
+        const validateCredits = userCredit.credits.find(credit => credit.state === true);
+        if (validateCredits) {
+            credit.state = true;
+        } else {
+            let numberRandom = Math.random() > 0.5;
+            credit.state = numberRandom;
+        }
+        const validatePayments = userCredit.credits.find(credit => credit.isPay === false && credit.state === true);
+
+        if (validatePayments) {
+            credit.state = false
+        }
+
         const [user, storeCredit] = await store.add(DNI, credit);
         const newCredit = await storeCredit;
         const userPromise = await user;
@@ -72,14 +84,20 @@ const getPenddingByUser = async(DNI) => {
 const getTotalCredits = async() => {
     try {
         const credits = await store.totalCredits();
-        const total = credits.reduce((total, credit) => {
-            if (total.value) {
-                return total.value + credit.value
-            } else {
-                return total + credit.value
-            }
-        })
-        return total;
+        if (credits.length > 0) {
+            const total = credits.reduce((total, credit) => {
+                if (total.value) {
+                    return total.value + credit.value
+                } else {
+                    return total + credit.value
+                }
+            });
+            if (total.value) return total.value
+            return total;
+        } else {
+            return 0;
+        }
+
     } catch (error) {
         const message = 'Ocurrio un error encontrando los creditos totales'
         console.error("getTotalCredits controller error", error);
